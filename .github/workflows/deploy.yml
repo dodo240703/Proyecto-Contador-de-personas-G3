@@ -28,7 +28,7 @@ jobs:
 
             echo "➡️  Rebuilding and redeploying services"
             cd dodoyfoxi_eruka_server/deploy
-            docker compose down
-            docker compose up -d --build
+            docker-compose down
+            docker-compose up -d --build
 
             echo "✔️ Deployment completed"
