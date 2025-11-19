@@ -20,7 +20,7 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           port: ${{ secrets.VM_SSH_PORT }}
           script: |
-            cd /opt/Proyecto-Contador-de-personas-G3
+            cd /opt/Proyecto-Contador-de-personas-G3/Proyecto-Contador-de-personas-G3
             echo "➡️  Pulling latest code"
             git reset --hard
             git clean -fd
