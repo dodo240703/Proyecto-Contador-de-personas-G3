@@ -14,19 +14,18 @@ services:
       - iot-network
 
   eureka-server:
+    build:
+      context: ..
     image: dodoyfoxi_eruka_server:latest
     container_name: dodoyfoxi-eruka-server
     ports:
       - "8761:8761"
     networks:
       - iot-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
   ingest-service:
+    build:
+      context: ../../ingest-service
     image: ingest-service:latest
     container_name: ingest-service
     ports:
@@ -43,6 +42,8 @@ services:
       - iot-network
 
   dashboard-api:
+    build:
+      context: ../../dashboard-api
     image: dashboard-api:latest
     container_name: dashboard-api
     ports:
