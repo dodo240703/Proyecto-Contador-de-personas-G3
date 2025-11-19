@@ -1,0 +1,76 @@
+services:
+  db:
+    image: postgres:15
+    container_name: postgres-iot
+    environment:
+      POSTGRES_USER: iot
+      POSTGRES_PASSWORD: iot
+      POSTGRES_DB: iotdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - iot-network
+
+  eureka-server:
+    image: dodoyfoxi_eruka_server:latest
+    container_name: dodoyfoxi-eruka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - iot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  ingest-service:
+    image: ingest-service:latest
+    container_name: ingest-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/iotdb
+      - SPRING_DATASOURCE_USERNAME=iot
+      - SPRING_DATASOURCE_PASSWORD=iot
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - db
+      - eureka-server
+    networks:
+      - iot-network
+
+  dashboard-api:
+    image: dashboard-api:latest
+    container_name: dashboard-api
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/iotdb
+      - SPRING_DATASOURCE_USERNAME=iot
+      - SPRING_DATASOURCE_PASSWORD=iot
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - db
+      - eureka-server
+    networks:
+      - iot-network
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: grafana-iot
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - iot-network
+
+volumes:
+  postgres_data:
+
+networks:
+  iot-network:
+    driver: bridge
