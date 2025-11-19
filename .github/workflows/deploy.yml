@@ -1,0 +1,34 @@
+name: Deploy to VM
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to VM via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          port: ${{ secrets.VM_SSH_PORT }}
+          script: |
+            cd /opt/Proyecto-Contador-de-personas-G3
+            echo "➡️  Pulling latest code"
+            git reset --hard
+            git clean -fd
+            git pull
+
+            echo "➡️  Rebuilding and redeploying services"
+            cd dodoyfoxi_eruka_server/deploy
+            docker compose down
+            docker compose up -d --build
+
+            echo "✔️ Deployment completed"
