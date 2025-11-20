@@ -59,17 +59,21 @@ services:
       - iot-network
 
   grafana:
-    image: grafana/grafana:10.4.2
-    container_name: grafana-iot
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-    networks:
-      - iot-network
+  image: grafana/grafana:10.4.2
+  container_name: grafana-iot
+  ports:
+    - "3000:3000"
+  volumes:
+    - grafana_data:/var/lib/grafana
+  depends_on:
+    - db
+  networks:
+    - iot-network
+
 
 volumes:
   postgres_data:
+  grafana_data:
 
 networks:
   iot-network:
